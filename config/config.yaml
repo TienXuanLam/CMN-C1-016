@@ -1,0 +1,10 @@
+max_retry: 3
+memory_enabled: false
+timeout_s: 30
+
+# Input validation
+max_spec_length: 4000
+
+# LLM configuration
+llm_temperature: 0.2
+llm_max_tokens: 4096

@@ -1,0 +1,39 @@
+# Agent Manifest — AgentRegistry entry point
+# AgentRegistry (mediator/registry/agent_registry.py) reads every key below at
+# ROOT level — do NOT nest keys under an `agent:` block. That nested shape is
+# invisible to the registry (falls back to defaults / KeyErrors).
+id: "CMN-C1-016"
+name: "cmn-c1-016"
+namespace: "cmn"
+version: "1.1.0"
+enabled: true
+category: "Cat 1"
+# Static generation contract. MainNode drives an LLM to generate source code
+# from a natural-language spec (see src/nodes/main_node.py).
+generation_mode: "llm"
+industry: "CMN"
+
+# Opaque compatibility metadata.
+base_type: "fixed-pipeline"
+
+# Entry point — single dotted import path (module.Class), NOT split module:/class:.
+# AgentRegistry does `manifest["class"].rsplit(".", 1)` to get (module, class_name).
+class: "src.graph.graph.CodeGenerationGraph"
+description: "Generic NL-to-code generation agent — users express language, framework, style, and testing requirements directly in a plain-text specification."
+
+# Security
+required_trust_level: "VERIFIED_EXTERNAL"
+
+# Compile-time gates (AgentRegistry._compile_and_cache) — declare every secret/extra
+# actually used, or the agent loads with those checks silently disabled.
+requires:
+  secrets:
+    - AZURE_OPENAI_API_KEY
+    - AZURE_OPENAI_ENDPOINT
+    - AZURE_OPENAI_DEPLOYMENT
+  extras: ["openai"]
+
+# generation_mode is deployment identity, not a tunable provider setting. Runtime parameters
+# (max_retry, timeout_s, hitl, memory_enabled, ...) live in
+# config/config.yaml — AgentRegistry loads that file separately and passes it
+# as Graph(config=...). Do NOT put them here.
